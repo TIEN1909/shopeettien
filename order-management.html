@@ -1,0 +1,599 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>Theo Dõi Đơn Hàng</title>
+<link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+:root {
+  --orange: #EE4D2D;
+  --orange-light: #FF6B47;
+  --orange-glow: rgba(238,77,45,0.15);
+  --bg: #111010;
+  --surface: #1c1b1a;
+  --surface2: #252321;
+  --border: rgba(255,255,255,0.08);
+  --border-orange: rgba(238,77,45,0.25);
+  --text: #f0ebe8;
+  --muted: #7a6e6b;
+  --success: #27ae60;
+  --warning: #e67e22;
+  --error: #e74c3c;
+  --info: #2980b9;
+}
+* { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+html, body { height: 100%; }
+body {
+  font-family: 'Be Vietnam Pro', sans-serif;
+  background: var(--bg); color: var(--text);
+  min-height: 100vh;
+}
+
+/* ── PAGE SYSTEM ── */
+.page { display: none; min-height: 100vh; flex-direction: column; }
+.page.active { display: flex; }
+
+/* ════════════════════════════════
+   LOGIN PAGE
+════════════════════════════════ */
+#page-login {
+  align-items: center; justify-content: center;
+  padding: 24px 20px;
+}
+.login-box {
+  width: 100%; max-width: 400px;
+}
+.login-logo {
+  text-align: center; margin-bottom: 32px;
+}
+.login-logo .icon {
+  width: 56px; height: 56px; border-radius: 18px;
+  background: linear-gradient(135deg, var(--orange), var(--orange-light));
+  display: inline-flex; align-items: center; justify-content: center;
+  font-size: 26px; margin-bottom: 14px;
+}
+.login-logo h1 { font-size: 22px; font-weight: 800; margin-bottom: 6px; }
+.login-logo p { font-size: 13px; color: var(--muted); }
+
+.login-card {
+  background: var(--surface); border: 1px solid var(--border);
+  border-radius: 20px; overflow: hidden;
+}
+.login-field { padding: 14px 18px; border-bottom: 1px solid var(--border); }
+.login-field:last-of-type { border-bottom: none; }
+.login-field label {
+  display: block; font-size: 11px; font-weight: 700; color: var(--muted);
+  text-transform: uppercase; letter-spacing: 0.06em; margin-bottom: 6px;
+}
+.login-field input {
+  width: 100%; background: transparent; border: none; outline: none;
+  color: var(--text); font-family: 'Be Vietnam Pro', sans-serif;
+  font-size: 16px; font-weight: 500; -webkit-appearance: none;
+}
+.login-field input::placeholder { color: #3d3735; }
+
+.btn-login {
+  width: 100%; padding: 16px; margin-top: 16px;
+  background: linear-gradient(135deg, var(--orange), var(--orange-light));
+  border: none; border-radius: 14px; color: white;
+  font-family: 'Be Vietnam Pro', sans-serif; font-size: 16px; font-weight: 700;
+  cursor: pointer; box-shadow: 0 4px 24px rgba(238,77,45,0.3);
+  transition: opacity 0.2s, transform 0.15s; -webkit-appearance: none;
+}
+.btn-login:active { opacity: 0.85; transform: scale(0.99); }
+.btn-login:disabled { opacity: 0.5; cursor: not-allowed; }
+
+.login-footer {
+  text-align: center; margin-top: 20px;
+  font-size: 13px; color: var(--muted);
+}
+.login-footer a { color: var(--orange-light); text-decoration: none; font-weight: 600; }
+
+/* ════════════════════════════════
+   DASHBOARD PAGE
+════════════════════════════════ */
+#page-dashboard { flex-direction: column; }
+
+/* ── NAVBAR ── */
+.navbar {
+  position: sticky; top: 0; z-index: 50;
+  background: rgba(17,16,16,0.92);
+  backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px);
+  border-bottom: 1px solid var(--border);
+  padding: 0 16px;
+  display: flex; align-items: center; justify-content: space-between;
+  height: 54px; flex-shrink: 0;
+}
+.navbar-brand { display: flex; align-items: center; gap: 8px; }
+.navbar-brand .dot {
+  width: 8px; height: 8px; border-radius: 50%;
+  background: var(--orange); box-shadow: 0 0 6px var(--orange);
+}
+.navbar-brand span { font-weight: 700; font-size: 14px; }
+.navbar-user { font-size: 12px; color: var(--muted); display: flex; align-items: center; gap: 10px; }
+.navbar-user strong { color: var(--orange-light); }
+.btn-out {
+  background: transparent; border: 1px solid var(--border);
+  border-radius: 8px; padding: 6px 12px; color: var(--muted);
+  font-family: 'Be Vietnam Pro', sans-serif; font-size: 12px; cursor: pointer;
+  transition: all 0.2s;
+}
+.btn-out:active { border-color: var(--error); color: var(--error); }
+
+/* ── ORDERS SCROLL AREA ── */
+.orders-area {
+  flex: 1; overflow-y: auto;
+  padding: 14px 14px 80px;
+  max-width: 700px; width: 100%; margin: 0 auto;
+}
+
+/* ── ORDER CARD ── */
+.order-card {
+  background: var(--surface); border: 1px solid var(--border);
+  border-radius: 16px; margin-bottom: 12px; overflow: hidden;
+}
+.order-head {
+  padding: 14px 16px 12px;
+  border-bottom: 1px solid var(--border);
+  display: flex; align-items: flex-start; justify-content: space-between; gap: 10px;
+}
+.order-name { font-size: 15px; font-weight: 700; line-height: 1.3; flex: 1; }
+.status-pill {
+  flex-shrink: 0; display: inline-flex; align-items: center; gap: 5px;
+  padding: 4px 10px; border-radius: 100px;
+  font-size: 11px; font-weight: 700; letter-spacing: 0.04em; white-space: nowrap;
+}
+.status-pill .dot { width: 6px; height: 6px; border-radius: 50%; background: currentColor; }
+.status-pill.PENDING    { background: rgba(122,110,107,0.15); color: var(--muted); }
+.status-pill.PROCESSING { background: rgba(230,126,34,0.15);  color: var(--warning); }
+.status-pill.SHIPPING   { background: rgba(41,128,185,0.15);  color: var(--info); }
+.status-pill.DONE       { background: rgba(39,174,96,0.15);   color: var(--success); }
+.status-pill.FAILED     { background: rgba(231,76,60,0.15);   color: var(--error); }
+
+.order-body { padding: 12px 16px; }
+.order-row {
+  display: flex; align-items: center; gap: 8px;
+  font-size: 13px; color: var(--muted); margin-bottom: 8px;
+}
+.order-row:last-child { margin-bottom: 0; }
+.order-row strong { color: var(--text); font-weight: 600; }
+.order-row a { color: var(--orange-light); text-decoration: none; overflow: hidden;
+  text-overflow: ellipsis; white-space: nowrap; flex: 1; min-width: 0; }
+.order-id-row { font-size: 11px; color: var(--muted); margin-bottom: 8px; }
+
+.order-foot {
+  padding: 12px 16px;
+  border-top: 1px solid var(--border);
+  display: flex; gap: 8px; align-items: center;
+}
+.order-foot select {
+  flex: 1; background: var(--surface2); border: 1px solid var(--border);
+  border-radius: 10px; padding: 10px 12px; color: var(--text);
+  font-family: 'Be Vietnam Pro', sans-serif; font-size: 13px; font-weight: 500;
+  outline: none; -webkit-appearance: none; cursor: pointer;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%237a6e6b' stroke-width='1.5' fill='none' stroke-linecap='round'/%3E%3C/svg%3E");
+  background-repeat: no-repeat; background-position: right 12px center;
+  padding-right: 32px;
+}
+.order-foot select option { background: #1c1b1a; }
+.btn-update {
+  background: linear-gradient(135deg, var(--orange), var(--orange-light));
+  border: none; border-radius: 10px; padding: 10px 16px;
+  color: white; font-family: 'Be Vietnam Pro', sans-serif;
+  font-size: 13px; font-weight: 700; cursor: pointer;
+  white-space: nowrap; transition: opacity 0.2s; flex-shrink: 0;
+  -webkit-appearance: none;
+}
+.btn-update:active { opacity: 0.8; }
+.btn-update:disabled { opacity: 0.5; cursor: not-allowed; }
+
+/* ── EMPTY / LOADING ── */
+.center-state {
+  display: flex; flex-direction: column; align-items: center; justify-content: center;
+  padding: 60px 20px; color: var(--muted); text-align: center; gap: 12px;
+}
+.center-state .icon { font-size: 42px; }
+.center-state p { font-size: 14px; }
+
+/* ── SPINNER ── */
+.spinner {
+  width: 16px; height: 16px;
+  border: 2px solid rgba(255,255,255,0.3);
+  border-top-color: white; border-radius: 50%;
+  animation: spin 0.7s linear infinite;
+  display: inline-block; vertical-align: middle; margin-right: 6px;
+}
+.spinner-lg {
+  width: 32px; height: 32px;
+  border: 3px solid rgba(238,77,45,0.2);
+  border-top-color: var(--orange); border-radius: 50%;
+  animation: spin 0.8s linear infinite;
+}
+@keyframes spin { to { transform: rotate(360deg); } }
+
+/* ── TOAST ── */
+.toast {
+  position: fixed; bottom: 20px; left: 14px; right: 14px;
+  background: #2a2826; border-radius: 12px; padding: 13px 16px;
+  display: flex; align-items: center; gap: 10px;
+  font-size: 14px; font-weight: 500;
+  transform: translateY(calc(100% + 36px)); opacity: 0;
+  transition: transform 0.35s cubic-bezier(0.34,1.56,0.64,1), opacity 0.25s;
+  z-index: 200; box-shadow: 0 8px 32px rgba(0,0,0,0.5);
+  border: 1px solid var(--border);
+}
+.toast.show { transform: translateY(0); opacity: 1; }
+.toast.success { border-color: rgba(39,174,96,0.4); }
+.toast.error   { border-color: rgba(231,76,60,0.4); }
+
+@media (min-width: 600px) {
+  .orders-area { padding: 20px 20px 80px; }
+  .toast { left: 50%; right: auto; transform: translateX(-50%) translateY(calc(100% + 36px)); width: 360px; }
+  .toast.show { transform: translateX(-50%) translateY(0); }
+}
+
+/* ── MODAL ── */
+.modal-overlay {
+  position: fixed; inset: 0; z-index: 300;
+  background: rgba(0,0,0,0.7);
+  backdrop-filter: blur(4px); -webkit-backdrop-filter: blur(4px);
+  display: flex; align-items: flex-end; justify-content: center;
+  opacity: 0; pointer-events: none;
+  transition: opacity 0.25s;
+}
+.modal-overlay.show { opacity: 1; pointer-events: all; }
+.modal {
+  background: var(--surface); border: 1px solid var(--border);
+  border-radius: 20px 20px 0 0; padding: 24px 20px 40px;
+  width: 100%; max-width: 500px;
+  transform: translateY(100%);
+  transition: transform 0.35s cubic-bezier(0.34,1.2,0.64,1);
+}
+.modal-overlay.show .modal { transform: translateY(0); }
+.modal-handle {
+  width: 36px; height: 4px; background: var(--border);
+  border-radius: 2px; margin: 0 auto 20px;
+}
+.modal-title { font-size: 17px; font-weight: 700; margin-bottom: 18px; }
+.modal-field { margin-bottom: 14px; }
+.modal-field label {
+  display: block; font-size: 11px; font-weight: 700; color: var(--muted);
+  text-transform: uppercase; letter-spacing: 0.06em; margin-bottom: 7px;
+}
+.modal-field input {
+  width: 100%; background: var(--surface2); border: 1px solid var(--border);
+  border-radius: 10px; padding: 13px 14px; color: var(--text);
+  font-family: "Be Vietnam Pro", sans-serif; font-size: 15px; font-weight: 500;
+  outline: none; -webkit-appearance: none; transition: border-color 0.2s;
+}
+.modal-field input:focus { border-color: var(--orange); }
+.modal-field input::placeholder { color: #3d3735; }
+.modal-actions { display: flex; gap: 10px; margin-top: 20px; }
+.btn-modal-cancel {
+  flex: 1; padding: 14px; background: transparent;
+  border: 1px solid var(--border); border-radius: 12px;
+  color: var(--muted); font-family: "Be Vietnam Pro", sans-serif;
+  font-size: 14px; font-weight: 600; cursor: pointer; transition: all 0.2s;
+}
+.btn-modal-cancel:active { border-color: var(--orange); color: var(--orange-light); }
+.btn-modal-confirm {
+  flex: 2; padding: 14px;
+  background: linear-gradient(135deg, var(--orange), var(--orange-light));
+  border: none; border-radius: 12px; color: white;
+  font-family: "Be Vietnam Pro", sans-serif; font-size: 14px; font-weight: 700;
+  cursor: pointer; transition: opacity 0.2s;
+}
+.btn-modal-confirm:active { opacity: 0.8; }
+.btn-modal-confirm:disabled { opacity: 0.5; cursor: not-allowed; }
+
+/* ── RESET PASS BUTTON IN NAVBAR ── */
+.btn-reset-pass {
+  background: transparent; border: 1px solid var(--border-orange);
+  border-radius: 8px; padding: 6px 12px; color: var(--orange-light);
+  font-family: "Be Vietnam Pro", sans-serif; font-size: 12px; font-weight: 600;
+  cursor: pointer; transition: all 0.2s; margin-right: 6px;
+}
+.btn-reset-pass:active { background: var(--orange-glow); }
+
+@media (min-width: 600px) {
+  .modal { border-radius: 20px; margin: 0 0 40px; }
+  .modal-overlay { align-items: center; }
+}
+</style>
+</head>
+<body>
+
+<!-- ══════════════ LOGIN ══════════════ -->
+<div class="page active" id="page-login">
+  <div class="login-box">
+    <div class="login-logo">
+      <div class="icon">🛍️</div>
+      <h1>Theo dõi đơn hàng</h1>
+      <p>Đăng nhập bằng email và mật khẩu đã nhận</p>
+    </div>
+
+    <div class="login-card">
+      <div class="login-field">
+        <label>Email</label>
+        <input type="email" id="login-email" placeholder="example@gmail.com" inputmode="email" autocomplete="email" />
+      </div>
+      <div class="login-field">
+        <label>Mật khẩu</label>
+        <input type="password" id="login-password" placeholder="••••••••" autocomplete="current-password" />
+      </div>
+    </div>
+
+    <button class="btn-login" id="loginBtn" onclick="handleLogin()">
+      <span class="btn-text">Đăng nhập</span>
+    </button>
+
+    <div class="login-footer">
+      Chưa có đơn? <a href="landing-page.html">Đăng ký tại đây →</a>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════ DASHBOARD ══════════════ -->
+<div class="page" id="page-dashboard">
+  <div class="navbar">
+    <div class="navbar-brand">
+      <div class="dot"></div>
+      <span>Đơn của tôi</span>
+    </div>
+    <div class="navbar-user">
+      <strong id="user-name-display"></strong>
+      <button class="btn-reset-pass" onclick="openResetModal()">🔑 Đổi mật khẩu</button>
+      <button class="btn-out" onclick="logout()">Thoát</button>
+    </div>
+  </div>
+
+  <div class="orders-area" id="orders-container">
+    <div class="center-state">
+      <div class="spinner-lg"></div>
+      <p>Đang tải...</p>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════ RESET PASSWORD MODAL ══════════════ -->
+<div class="modal-overlay" id="modal-overlay" onclick="handleOverlayClick(event)">
+  <div class="modal">
+    <div class="modal-handle"></div>
+    <div class="modal-title">🔑 Đổi mật khẩu</div>
+    <div class="modal-field">
+      <label>Mật khẩu hiện tại</label>
+      <input type="password" id="old-pass" placeholder="••••••••" />
+    </div>
+    <div class="modal-field">
+      <label>Mật khẩu mới</label>
+      <input type="password" id="new-pass" placeholder="Tối thiểu 6 ký tự" />
+    </div>
+    <div class="modal-field">
+      <label>Xác nhận mật khẩu mới</label>
+      <input type="password" id="confirm-pass" placeholder="Nhập lại mật khẩu mới" />
+    </div>
+    <div class="modal-actions">
+      <button class="btn-modal-cancel" onclick="closeResetModal()">Huỷ</button>
+      <button class="btn-modal-confirm" id="confirmResetBtn" onclick="handleResetPassword()">
+        <span class="confirm-text">Xác nhận</span>
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- TOAST -->
+<div class="toast" id="toast">
+  <span id="toastIcon"></span>
+  <span id="toastMsg"></span>
+</div>
+
+<script>
+  const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbw0PL4yFXm4j8d3ndfFXdMzDvR7yRQ3kYjFqkznrGaNuw_fCGCezYEVwvcVcssswJ8B/exec";
+
+  const STATUS_LABELS = {
+    PENDING:    'Chờ xử lý',
+    PROCESSING: 'Đang xử lý',
+    SHIPPING:   'Đang giao',
+    DONE:       'Hoàn thành',
+    FAILED:     'Thất bại',
+  };
+
+  let currentUser = null;
+
+  function showToast(msg, type = 'success') {
+    const t = document.getElementById('toast');
+    document.getElementById('toastIcon').textContent = type === 'success' ? '✅' : '❌';
+    document.getElementById('toastMsg').textContent = msg;
+    t.className = 'toast ' + type + ' show';
+    setTimeout(() => t.classList.remove('show'), 3200);
+  }
+
+  function showPage(id) {
+    document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+    document.getElementById('page-' + id).classList.add('active');
+  }
+
+  async function handleLogin() {
+    const email    = document.getElementById('login-email').value.trim();
+    const password = document.getElementById('login-password').value.trim();
+    if (!email || !password) { showToast('Vui lòng nhập đầy đủ!', 'error'); return; }
+
+    const btn = document.getElementById('loginBtn');
+    btn.disabled = true;
+    btn.querySelector('.btn-text').innerHTML = '<span class="spinner"></span> Đang đăng nhập...';
+
+    try {
+      const res  = await fetch(`${SCRIPT_URL}?action=login&email=${encodeURIComponent(email)}&password=${encodeURIComponent(password)}`);
+      const data = await res.json();
+      if (data.success) {
+        currentUser = data.user;
+        document.getElementById('user-name-display').textContent = currentUser.name;
+        showPage('dashboard');
+        loadOrders();
+      } else {
+        showToast(data.error || 'Email hoặc mật khẩu sai!', 'error');
+      }
+    } catch {
+      showToast('Lỗi kết nối. Thử lại!', 'error');
+    } finally {
+      btn.disabled = false;
+      btn.querySelector('.btn-text').textContent = 'Đăng nhập';
+    }
+  }
+
+  async function loadOrders() {
+    document.getElementById('orders-container').innerHTML =
+      '<div class="center-state"><div class="spinner-lg"></div><p>Đang tải...</p></div>';
+    try {
+      const res  = await fetch(`${SCRIPT_URL}?action=getOrders&email=${encodeURIComponent(currentUser.email)}`);
+      const data = await res.json();
+      renderOrders(data.orders || []);
+    } catch {
+      document.getElementById('orders-container').innerHTML =
+        '<div class="center-state"><div class="icon">⚠️</div><p>Lỗi tải dữ liệu</p></div>';
+    }
+  }
+
+  function renderOrders(orders) {
+    const c = document.getElementById('orders-container');
+    if (!orders.length) {
+      c.innerHTML = '<div class="center-state"><div class="icon">📦</div><p>Chưa có đơn hàng nào</p></div>';
+      return;
+    }
+
+    c.innerHTML = orders.map(o => `
+      <div class="order-card">
+        <div class="order-head">
+          <div>
+            <div class="order-id-row">🆔 #${o.id} · ${o.createdAt}</div>
+            <div class="order-name">${o.productName}</div>
+          </div>
+          <span class="status-pill ${o.status}">
+            <span class="dot"></span>${STATUS_LABELS[o.status] || o.status}
+          </span>
+        </div>
+        <div class="order-body">
+          <div class="order-row">
+            <span>📦 Số lượng:</span>
+            <strong>${o.quantity} máy</strong>
+          </div>
+          <div class="order-row">
+            <span>💰 Giá:</span>
+            <strong>${Number(o.price).toLocaleString('vi-VN')} ₫</strong>
+          </div>
+          <div class="order-row">
+            <span style="flex-shrink:0">🔗 Link:</span>
+            <a href="${o.productLink}" target="_blank">${o.productLink}</a>
+          </div>
+        </div>
+        <div class="order-foot">
+          <select id="sel-${o.id}">
+            ${Object.entries(STATUS_LABELS).map(([v, l]) =>
+              `<option value="${v}" ${o.status === v ? 'selected' : ''}>${l}</option>`
+            ).join('')}
+          </select>
+          <button class="btn-update" onclick="updateStatus('${o.id}')">Cập nhật</button>
+        </div>
+      </div>
+    `).join('');
+  }
+
+  async function updateStatus(orderId) {
+    const sel = document.getElementById(`sel-${orderId}`);
+    const status = sel.value;
+    const btn = sel.nextElementSibling;
+    btn.disabled = true; btn.textContent = '...';
+
+    try {
+      const res  = await fetch(`${SCRIPT_URL}?action=updateStatus&id=${orderId}&status=${status}&email=${encodeURIComponent(currentUser.email)}`);
+      const data = await res.json();
+      if (data.success) {
+        showToast(`✓ ${STATUS_LABELS[status]}`, 'success');
+        loadOrders();
+      } else {
+        showToast(data.error || 'Cập nhật thất bại!', 'error');
+        btn.disabled = false; btn.textContent = 'Cập nhật';
+      }
+    } catch {
+      showToast('Lỗi kết nối!', 'error');
+      btn.disabled = false; btn.textContent = 'Cập nhật';
+    }
+  }
+
+  function logout() {
+    currentUser = null;
+    document.getElementById('login-email').value = '';
+    document.getElementById('login-password').value = '';
+    showPage('login');
+  }
+
+  document.addEventListener('keydown', e => {
+    if (e.key === 'Enter' && document.getElementById('page-login').classList.contains('active'))
+      handleLogin();
+  });
+
+  // Auto fill email từ URL
+  const urlEmail = new URLSearchParams(window.location.search).get('email');
+  if (urlEmail) {
+    document.getElementById('login-email').value = urlEmail;
+    document.getElementById('login-password').focus();
+  }
+
+  // ── RESET PASSWORD ──
+  function openResetModal() {
+    document.getElementById('old-pass').value = '';
+    document.getElementById('new-pass').value = '';
+    document.getElementById('confirm-pass').value = '';
+    document.getElementById('modal-overlay').classList.add('show');
+    setTimeout(() => document.getElementById('old-pass').focus(), 350);
+  }
+
+  function closeResetModal() {
+    document.getElementById('modal-overlay').classList.remove('show');
+  }
+
+  function handleOverlayClick(e) {
+    if (e.target === document.getElementById('modal-overlay')) closeResetModal();
+  }
+
+  async function handleResetPassword() {
+    const oldPass     = document.getElementById('old-pass').value.trim();
+    const newPass     = document.getElementById('new-pass').value.trim();
+    const confirmPass = document.getElementById('confirm-pass').value.trim();
+
+    if (!oldPass || !newPass || !confirmPass) {
+      showToast('Vui lòng điền đầy đủ!', 'error'); return;
+    }
+    if (newPass.length < 6) {
+      showToast('Mật khẩu mới phải có ít nhất 6 ký tự!', 'error'); return;
+    }
+    if (newPass !== confirmPass) {
+      showToast('Mật khẩu xác nhận không khớp!', 'error'); return;
+    }
+
+    const btn = document.getElementById('confirmResetBtn');
+    btn.disabled = true;
+    btn.querySelector('.confirm-text').innerHTML = '<span class="spinner"></span>';
+
+    try {
+      const res  = await fetch(`${SCRIPT_URL}?action=resetPassword&email=${encodeURIComponent(currentUser.email)}&oldPassword=${encodeURIComponent(oldPass)}&newPassword=${encodeURIComponent(newPass)}`);
+      const data = await res.json();
+
+      if (data.success) {
+        closeResetModal();
+        showToast('Đổi mật khẩu thành công! ✅', 'success');
+      } else {
+        showToast(data.error || 'Đổi mật khẩu thất bại!', 'error');
+      }
+    } catch {
+      showToast('Lỗi kết nối!', 'error');
+    } finally {
+      btn.disabled = false;
+      btn.querySelector('.confirm-text').innerHTML = 'Xác nhận';
+    }
+  }
+
+</script>
+</body>
+</html>

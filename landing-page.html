@@ -1,0 +1,513 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>Đăng Ký Mua Hộ Shopee</title>
+<link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+:root {
+  --orange: #EE4D2D;
+  --orange-light: #FF6B47;
+  --orange-glow: rgba(238,77,45,0.15);
+  --bg: #111010;
+  --surface: #1c1b1a;
+  --surface2: #252321;
+  --border: rgba(255,255,255,0.08);
+  --border-orange: rgba(238,77,45,0.25);
+  --text: #f0ebe8;
+  --muted: #7a6e6b;
+  --success: #27ae60;
+  --error: #e74c3c;
+}
+* { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+html, body { height: 100%; }
+body {
+  font-family: 'Be Vietnam Pro', sans-serif;
+  background: var(--bg);
+  color: var(--text);
+  min-height: 100vh;
+  min-height: -webkit-fill-available;
+}
+
+/* ── TOP BAR ── */
+.topbar {
+  position: sticky; top: 0; z-index: 50;
+  background: rgba(17,16,16,0.92);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border-bottom: 1px solid var(--border);
+  padding: 14px 20px;
+  display: flex; align-items: center; justify-content: space-between;
+}
+.topbar-logo { display: flex; align-items: center; gap: 10px; }
+.topbar-logo .icon {
+  width: 34px; height: 34px; border-radius: 10px;
+  background: linear-gradient(135deg, var(--orange), var(--orange-light));
+  display: flex; align-items: center; justify-content: center;
+  font-size: 16px;
+}
+.topbar-logo span { font-weight: 700; font-size: 15px; }
+.topbar-login {
+  font-size: 13px; font-weight: 600; color: var(--orange-light);
+  text-decoration: none; padding: 7px 14px;
+  border: 1px solid var(--border-orange); border-radius: 8px;
+  transition: background 0.2s;
+}
+.topbar-login:active { background: var(--orange-glow); }
+
+/* ── HERO ── */
+.hero {
+  padding: 32px 20px 24px;
+  text-align: center;
+}
+.hero h1 { font-size: 26px; font-weight: 800; line-height: 1.2; margin-bottom: 10px; }
+.hero h1 em { font-style: normal;
+  background: linear-gradient(135deg, var(--orange), var(--orange-light));
+  -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
+}
+.hero p { font-size: 14px; color: var(--muted); line-height: 1.6; max-width: 340px; margin: 0 auto; }
+
+/* ── FORM CONTAINER ── */
+.form-wrap {
+  padding: 0 16px 40px;
+  max-width: 600px;
+  margin: 0 auto;
+  width: 100%;
+}
+
+/* ── SECTION ── */
+.section {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  overflow: hidden;
+  margin-bottom: 12px;
+}
+.section-title {
+  padding: 14px 16px 0;
+  font-size: 11px; font-weight: 700; letter-spacing: 0.08em;
+  text-transform: uppercase; color: var(--muted);
+}
+
+/* ── FIELD ── */
+.field { padding: 12px 16px; border-bottom: 1px solid var(--border); position: relative; }
+.field:last-child { border-bottom: none; }
+.field label {
+  display: block; font-size: 11px; font-weight: 600;
+  color: var(--muted); text-transform: uppercase; letter-spacing: 0.06em;
+  margin-bottom: 6px;
+}
+.field label .req { color: var(--orange); }
+.label-hint { color: var(--muted); font-weight: 400; text-transform: none; letter-spacing: 0; font-size: 11px; margin-left: 4px; }
+.field input, .field textarea {
+  width: 100%; background: transparent; border: none; outline: none;
+  color: var(--text); font-family: 'Be Vietnam Pro', sans-serif;
+  font-size: 15px; font-weight: 500; padding: 0;
+  -webkit-appearance: none;
+}
+.field input::placeholder, .field textarea::placeholder { color: #3d3735; }
+.field textarea { resize: none; min-height: 64px; line-height: 1.5; }
+
+/* Price row */
+.price-row { display: flex; align-items: center; gap: 8px; }
+.price-row .currency { color: var(--orange); font-weight: 700; font-size: 15px; flex-shrink: 0; }
+.price-row input { flex: 1; }
+
+/* ── DROPDOWN TRIGGER ── */
+.dropdown-trigger {
+  display: flex; align-items: center; justify-content: space-between;
+  cursor: pointer; user-select: none;
+}
+.dropdown-trigger .trigger-text {
+  font-size: 15px; font-weight: 500;
+  color: var(--text);
+  flex: 1;
+  white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+}
+.dropdown-trigger .trigger-text.placeholder { color: #3d3735; }
+.dropdown-trigger .chevron {
+  width: 20px; height: 20px; flex-shrink: 0; margin-left: 8px;
+  display: flex; align-items: center; justify-content: center;
+  color: var(--muted);
+  transition: transform 0.25s cubic-bezier(0.34,1.56,0.64,1);
+}
+.dropdown-trigger.open .chevron { transform: rotate(180deg); }
+
+/* Loading dots */
+.loading-dots {
+  display: flex; gap: 4px; align-items: center;
+}
+.loading-dots span {
+  width: 5px; height: 5px; border-radius: 50%;
+  background: var(--orange); opacity: 0.5;
+  animation: dotBounce 1.2s ease-in-out infinite;
+}
+.loading-dots span:nth-child(2) { animation-delay: 0.2s; }
+.loading-dots span:nth-child(3) { animation-delay: 0.4s; }
+@keyframes dotBounce {
+  0%, 80%, 100% { transform: scale(0.7); opacity: 0.3; }
+  40% { transform: scale(1); opacity: 1; }
+}
+
+/* ── DROPDOWN PANEL ── */
+.dropdown-panel {
+  position: absolute;
+  left: 0; right: 0;
+  top: calc(100% + 4px);
+  background: #1e1d1c;
+  border: 1px solid var(--border-orange);
+  border-radius: 14px;
+  overflow: hidden;
+  z-index: 100;
+  box-shadow: 0 12px 40px rgba(0,0,0,0.6), 0 0 0 1px rgba(238,77,45,0.05);
+  max-height: 0;
+  opacity: 0;
+  transform: translateY(-6px);
+  transition: max-height 0.3s cubic-bezier(0.4,0,0.2,1),
+              opacity 0.2s ease,
+              transform 0.25s cubic-bezier(0.34,1.56,0.64,1);
+  pointer-events: none;
+}
+.dropdown-panel.open {
+  max-height: 400px;
+  opacity: 1;
+  transform: translateY(0);
+  pointer-events: all;
+}
+
+.dropdown-item {
+  padding: 14px 16px;
+  border-bottom: 1px solid var(--border);
+  cursor: pointer;
+  transition: background 0.15s;
+  position: relative;
+}
+.dropdown-item:last-child { border-bottom: none; }
+.dropdown-item:hover { background: rgba(238,77,45,0.07); }
+.dropdown-item.selected { background: rgba(238,77,45,0.1); }
+.dropdown-item.selected::before {
+  content: '';
+  position: absolute; left: 0; top: 0; bottom: 0;
+  width: 3px;
+  background: linear-gradient(180deg, var(--orange), var(--orange-light));
+  border-radius: 0 2px 2px 0;
+}
+
+.item-price {
+  font-size: 16px; font-weight: 700;
+  color: var(--orange-light);
+  margin-bottom: 5px;
+  display: flex; align-items: center; gap: 6px;
+}
+.item-price .badge {
+  font-size: 10px; font-weight: 600;
+  background: var(--orange-glow);
+  color: var(--orange);
+  border: 1px solid var(--border-orange);
+  padding: 2px 7px; border-radius: 20px;
+  letter-spacing: 0.04em;
+}
+.item-link {
+  font-size: 12px; color: var(--muted);
+  font-weight: 400;
+  white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+  display: flex; align-items: center; gap: 5px;
+}
+.item-link svg { flex-shrink: 0; }
+
+.dropdown-empty {
+  padding: 20px 16px;
+  text-align: center;
+  color: var(--muted);
+  font-size: 13px;
+}
+
+/* ── SUBMIT ── */
+.btn-submit {
+  width: 100%; padding: 16px;
+  background: linear-gradient(135deg, var(--orange), var(--orange-light));
+  border: none; border-radius: 14px;
+  color: white; font-family: 'Be Vietnam Pro', sans-serif;
+  font-size: 16px; font-weight: 700; cursor: pointer;
+  box-shadow: 0 4px 24px rgba(238,77,45,0.35);
+  transition: opacity 0.2s, transform 0.15s;
+  margin-top: 4px;
+  -webkit-appearance: none;
+}
+.btn-submit:active { opacity: 0.85; transform: scale(0.99); }
+.btn-submit:disabled { opacity: 0.5; cursor: not-allowed; }
+
+/* ── SPINNER ── */
+.spinner {
+  width: 16px; height: 16px;
+  border: 2px solid rgba(255,255,255,0.3);
+  border-top-color: white; border-radius: 50%;
+  animation: spin 0.7s linear infinite;
+  display: inline-block; vertical-align: middle; margin-right: 6px;
+}
+@keyframes spin { to { transform: rotate(360deg); } }
+
+/* ── TOAST ── */
+.toast {
+  position: fixed; bottom: 24px; left: 16px; right: 16px;
+  background: #2a2826; border-radius: 12px; padding: 14px 18px;
+  display: flex; align-items: center; gap: 10px;
+  font-size: 14px; font-weight: 500;
+  transform: translateY(calc(100% + 40px)); opacity: 0;
+  transition: transform 0.35s cubic-bezier(0.34,1.56,0.64,1), opacity 0.25s;
+  z-index: 200; box-shadow: 0 8px 32px rgba(0,0,0,0.5);
+  border: 1px solid var(--border);
+}
+.toast.show { transform: translateY(0); opacity: 1; }
+.toast.success { border-color: rgba(39,174,96,0.4); }
+.toast.error   { border-color: rgba(231,76,60,0.4); }
+
+@media (min-width: 600px) {
+  .hero h1 { font-size: 32px; }
+  .field input, .field textarea { font-size: 15px; }
+  .form-wrap { padding: 0 24px 60px; }
+  .toast { left: 50%; right: auto; transform: translateX(-50%) translateY(calc(100% + 40px));
+    width: 380px; }
+  .toast.show { transform: translateX(-50%) translateY(0); }
+}
+</style>
+</head>
+<body>
+
+<div class="topbar">
+  <div class="topbar-logo">
+    <div class="icon">🛍️</div>
+    <span>Mua Hộ Shopee</span>
+  </div>
+  <a href="order-management.html" class="topbar-login">Theo dõi đơn →</a>
+</div>
+
+<div class="hero">
+  <h1>Đăng ký mua điện thoại Shopee</h1>
+</div>
+
+<div class="form-wrap">
+
+  <!-- Thông tin cá nhân -->
+  <div class="section">
+    <div class="section-title">Thông tin cá nhân</div>
+    <div class="field">
+      <label>Họ & Tên <span class="req">*</span></label>
+      <input type="text" id="name" placeholder="Nguyễn Văn A" autocomplete="name" />
+    </div>
+    <div class="field">
+      <label>Email <span class="req">*</span><span class="label-hint">— mật khẩu gửi về đây</span></label>
+      <input type="email" id="email" placeholder="example@gmail.com" autocomplete="email" inputmode="email" />
+    </div>
+    <div class="field">
+      <label>Số điện thoại <span class="req">*</span></label>
+      <input type="tel" id="phone" placeholder="0901 234 567" autocomplete="tel" inputmode="tel" />
+    </div>
+  </div>
+
+  <!-- Thông tin sản phẩm -->
+  <div class="section">
+    <div class="section-title">Thông tin sản phẩm</div>
+    <div class="field">
+      <label>Tên sản phẩm <span class="req">*</span></label>
+      <input type="text" id="productName" placeholder="iPhone 15 Pro Max 256GB" />
+    </div>
+
+    <!-- DROPDOWN FIELD -->
+    <div class="field" id="linkField" style="overflow: visible;">
+      <label>Link Shopee <span class="req">*</span></label>
+      <div class="dropdown-trigger" id="dropdownTrigger" onclick="toggleDropdown()">
+        <span class="trigger-text placeholder" id="triggerText">Chọn sản phẩm...</span>
+        <span class="chevron" id="chevron">
+          <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
+            <path d="M2.5 5L7 9.5L11.5 5" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+        </span>
+      </div>
+
+      <!-- Hidden inputs -->
+      <input type="hidden" id="productLink" />
+
+      <!-- Dropdown panel -->
+      <div class="dropdown-panel" id="dropdownPanel">
+        <div id="dropdownContent">
+          <div class="dropdown-empty">
+            <div class="loading-dots" style="justify-content:center;margin-bottom:8px;">
+              <span></span><span></span><span></span>
+            </div>
+            Đang tải danh sách...
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="field">
+      <label>Số lượng <span class="req">*</span></label>
+      <input type="number" id="quantity" placeholder="1" min="1" max="99" inputmode="numeric" />
+    </div>
+    <div class="field">
+      <label>Giá tiền (VNĐ) <span class="req">*</span></label>
+      <div class="price-row">
+        <span class="currency">₫</span>
+        <input type="number" id="price" placeholder="0" min="0" step="1000" inputmode="numeric" />
+      </div>
+    </div>
+    <div class="field">
+      <label>Ghi chú</label>
+      <textarea id="note" placeholder="Màu sắc, dung lượng, yêu cầu khác..."></textarea>
+    </div>
+  </div>
+
+  <button class="btn-submit" id="submitBtn" onclick="handleSubmit()">
+    📤 Gửi đăng ký
+  </button>
+
+</div>
+
+<div class="toast" id="toast">
+  <span id="toastIcon"></span>
+  <span id="toastMsg"></span>
+</div>
+
+<script>
+  const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbw0PL4yFXm4j8d3ndfFXdMzDvR7yRQ3kYjFqkznrGaNuw_fCGCezYEVwvcVcssswJ8B/exec";
+  const API_URL    = "https://64e307aebac46e480e780c02.mockapi.io/orders";
+
+  let orders = [];
+  let selectedOrder = null;
+  let dropdownOpen = false;
+
+  /* ── FORMAT PRICE ── */
+  function formatPrice(n) {
+    return n.toLocaleString('vi-VN') + ' ₫';
+  }
+
+  /* ── FETCH ORDERS ── */
+  async function fetchOrders() {
+    try {
+      const res = await fetch(API_URL);
+      orders = await res.json();
+      renderDropdown();
+    } catch {
+      document.getElementById('dropdownContent').innerHTML =
+        '<div class="dropdown-empty">⚠️ Không tải được danh sách</div>';
+    }
+  }
+
+  /* ── RENDER DROPDOWN ITEMS ── */
+  function renderDropdown() {
+    if (!orders.length) {
+      document.getElementById('dropdownContent').innerHTML =
+        '<div class="dropdown-empty">Không có sản phẩm nào</div>';
+      return;
+    }
+    document.getElementById('dropdownContent').innerHTML = orders.map((o, i) => `
+      <div class="dropdown-item ${selectedOrder === i ? 'selected' : ''}"
+           onclick="selectOrder(${i})">
+        <div class="item-price">
+          ${formatPrice(o.price)}
+        </div>
+        <div class="item-link">
+          ${o.link}
+        </div>
+      </div>
+    `).join('');
+  }
+
+  /* ── TOGGLE DROPDOWN ── */
+  function toggleDropdown() {
+    dropdownOpen = !dropdownOpen;
+    const panel   = document.getElementById('dropdownPanel');
+    const trigger = document.getElementById('dropdownTrigger');
+    panel.classList.toggle('open', dropdownOpen);
+    trigger.classList.toggle('open', dropdownOpen);
+  }
+
+  /* ── SELECT ORDER ── */
+  function selectOrder(i) {
+    selectedOrder = i;
+    const o = orders[i];
+
+    // Update trigger display
+    const triggerText = document.getElementById('triggerText');
+    triggerText.classList.remove('placeholder');
+    triggerText.textContent = `${o.link}`;
+
+    // Set hidden inputs
+    document.getElementById('productLink').value = o.link;
+    document.getElementById('price').value = o.price;
+
+    // Close dropdown
+    dropdownOpen = false;
+    document.getElementById('dropdownPanel').classList.remove('open');
+    document.getElementById('dropdownTrigger').classList.remove('open');
+
+    // Re-render to show selected state
+    renderDropdown();
+  }
+
+  /* ── CLOSE ON OUTSIDE CLICK ── */
+  document.addEventListener('click', function(e) {
+    const field = document.getElementById('linkField');
+    if (!field.contains(e.target) && dropdownOpen) {
+      dropdownOpen = false;
+      document.getElementById('dropdownPanel').classList.remove('open');
+      document.getElementById('dropdownTrigger').classList.remove('open');
+    }
+  });
+
+  /* ── TOAST ── */
+  function showToast(msg, type = 'success') {
+    const t = document.getElementById('toast');
+    document.getElementById('toastIcon').textContent = type === 'success' ? '✅' : '❌';
+    document.getElementById('toastMsg').textContent = msg;
+    t.className = 'toast ' + type + ' show';
+    setTimeout(() => t.classList.remove('show'), 4000);
+  }
+
+  /* ── SUBMIT ── */
+  async function handleSubmit() {
+    const name        = document.getElementById('name').value.trim();
+    const email       = document.getElementById('email').value.trim();
+    const phone       = document.getElementById('phone').value.trim();
+    const productName = document.getElementById('productName').value.trim();
+    const productLink = document.getElementById('productLink').value.trim();
+    const quantity    = document.getElementById('quantity').value.trim();
+    const price       = document.getElementById('price').value.trim();
+    const note        = document.getElementById('note').value.trim();
+
+    if (!name || !email || !phone || !productName || !productLink || !quantity || !price) {
+      showToast('Vui lòng điền đầy đủ thông tin!', 'error'); return;
+    }
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+      showToast('Email không hợp lệ!', 'error'); return;
+    }
+
+    const btn = document.getElementById('submitBtn');
+    btn.disabled = true;
+    btn.innerHTML = '<span class="spinner"></span> Đang gửi...';
+
+    try {
+      await fetch(SCRIPT_URL, {
+        method: 'POST', mode: 'no-cors',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ name, email, phone, productName, productLink,
+          quantity: parseInt(quantity), price: parseInt(price), note })
+      });
+      showToast('Đăng ký thành công! Đang chuyển trang...', 'success');
+      setTimeout(() => {
+        window.location.href = 'order-management.html?email=' + encodeURIComponent(email);
+      }, 1500);
+    } catch {
+      showToast('Lỗi kết nối. Thử lại!', 'error');
+      btn.disabled = false;
+      btn.innerHTML = '📤 Gửi đăng ký';
+    }
+  }
+
+  /* ── INIT ── */
+  fetchOrders();
+</script>
+</body>
+</html>
